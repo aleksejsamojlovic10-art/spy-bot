@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шпион Игра</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 30px;
+        }
+        .role-card {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        .location {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #ffd700;
+        }
+        .spy {
+            font-size: 2.5em;
+            color: #ff4444;
+        }
+        button {
+            background: #ffd700;
+            border: none;
+            color: #333;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #ffed4a;
+        }
+        .players-list {
+            text-align: left;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        .player-item {
+            padding: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+    </style>
+</head>
+<body>
+    <h1>🕵️ Игра Шпион</h1>
+    
+    <div class="role-card" id="roleCard">
+        <!-- Здесь будет роль игрока -->
+        <p>Загрузка...</p>
+    </div>
+    
+    <div class="players-list" id="playersList">
+        <h3>Игроки:</h3>
+        <!-- Здесь будет список игроков -->
+    </div>
+    
+    <button onclick="vote()">🗳️ Голосовать</button>
+    <button onclick="sendLocation()">📍 Моя локация</button>
+    
+    <script>
+        // Получаем данные из Telegram
+        const tg = window.Telegram.WebApp;
+        
+        // Показываем, что приложение готово
+        tg.ready();
+        
+        // Расширяем на весь экран
+        tg.expand();
+        
+        // Функция для голосования
+        function vote() {
+            tg.sendData(JSON.stringify({
+                action: 'vote',
+                player: tg.initDataUnsafe?.user?.id
+            }));
+            tg.showAlert('Голосование отправлено!');
+        }
+        
+        // Функция отправки локации
+        function sendLocation() {
+            tg.sendData(JSON.stringify({
+                action: 'location_request'
+            }));
+        }
+        
+        // Получаем данные от бота (если есть)
+        if (tg.initDataUnsafe?.user) {
+            document.getElementById('roleCard').innerHTML = `
+                <p>Привет, ${tg.initDataUnsafe.user.first_name}!</p>
+                <p class="spy">🕵️ Твоя роль определится при старте игры</p>
+            `;
+        }
+        
+        // Пример списка игроков
+        const players = ['Игрок 1', 'Игрок 2', 'Игрок 3'];
+        let playersHtml = '';
+        players.forEach(player => {
+            playersHtml += `<div class="player-item">👤 ${player}</div>`;
+        });
+        document.getElementById('playersList').innerHTML += playersHtml;
+    </script>
+    
+    <!-- Подключаем Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</body>
+</html>
